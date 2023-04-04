@@ -68,22 +68,22 @@ class ProtocolHandler(object):
             data = data.encode('utf-8')
 
         if isinstance(data, bytes):
-            buf.write(f'${len(data)}\r\n{data}\r\n')
+            buf.write(f'${len(data)}\r\n{data}\r\n'.encode('utf-8'))
         elif isinstance(data, int):
-            buf.write(f':{data}\r\n')
+            buf.write(f':{data}\r\n'.encode('utf-8'))
         elif isinstance(data, Error):
-            buf.write(f'-{error.message}\r\n')
+            buf.write(f'-{error.message}\r\n'.encode('utf-8'))
         elif isinstance(data, (list, tuple)):
-            buf.write(f'*{len(data)}\r\n')
+            buf.write(f'*{len(data)}\r\n'.encode('utf-8'))
             for item in data:
                 self._write(buf, item)
         elif isinstance(data, dict):
-            buf.write(f'%{len(data)}\r\n')
+            buf.write(f'%{len(data)}\r\n'.encode('utf-8'))
             for key in data:
                 self._write(buf, key)
                 self._write(buf, data[key])
         elif data is None:
-            buf.write('$-1\r\n')
+            buf.write(b'$-1\r\n')
         else:
             raise CommandError(f'unrecognized type: {type(data)}')
 
@@ -180,7 +180,7 @@ class Client(object):
         self._fh = self._socket.makefile('rwb')
 
     def execute(self, *args):
-        self._protocol.write_responses(self._fh, args)
+        self._protocol.write_response(self._fh, args)
         resp = self._protocol.handle_request(self._fh)
         if isinstance(resp, Error):
             raise CommandError(resp.message)
