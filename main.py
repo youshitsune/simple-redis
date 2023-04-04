@@ -25,7 +25,6 @@ class ProtocolHandler(object):
         first_byte = socket_file.read(1)
         if not first_byte:
             raise Disconnect()
-
         try:
             return self.handlers[first_byte](socket_file)
         except KeyError:
@@ -78,7 +77,7 @@ class ProtocolHandler(object):
             for item in data:
                 self._write(buf, item)
         elif isinstance(data, dict):
-            buf.write(f'%{len(data)}\r\n'.encode('utf-8'))
+            buf.write(f'%%{len(data)}\r\n'.encode('utf-8'))
             for key in data:
                 self._write(buf, key)
                 self._write(buf, data[key])
